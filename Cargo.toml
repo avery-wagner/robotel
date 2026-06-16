@@ -1,0 +1,29 @@
+[package]
+name = "robotel"
+version = "0.1.0"
+edition = "2021"
+description= "OpenTelemetry harness for a mini robotics simulator, written in Rust."
+license = "MIT"
+repository = "https://github.com/avery-wagner/robotel"
+
+[dependencies]
+opentelemetry = "0.27"
+opentelemetry_sdk = { version = "0.27", features = ["trace", "rt-tokio"] }
+
+opentelemetry-stdout = { version = "0.27", features = ["trace"] }
+opentelemetry-otlp = { version = "0.27", features = ["trace", "http-proto", "reqwest-blocking-client"] }
+
+# async runtime
+tokio = { version = "1", features = ["full"] }
+
+anyhow = "1" # err handling
+rand = "0.8"
+tracing = "0.1" 
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-opentelemetry = "0.28"
+
+[profile.dev]
+opt-level = 1 # speeds up dev runtime
+
+[profile.release]
+lto = true
