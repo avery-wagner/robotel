@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         BoundingBox::new(2.0, 2.0),
         Some(curr_cmd),
     );
-    let obj1 = Object::new(Pose::new(10.0, 0.0, 0.0), BoundingBox::new(2.0, 2.0));
+    let obj1 = Object::new(Pose::new(15.0, 15.0, 0.0), BoundingBox::new(1.0, 1.0));
     let mut world = World::init(WorldConfig::new(20, 20), robot, vec![obj1], stdout);
 
     world.setup_ui();

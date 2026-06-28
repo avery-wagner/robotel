@@ -9,8 +9,8 @@ pub struct Point {
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoundingBox {
-    w: f64,
-    h: f64,
+    pub w: f64,
+    pub h: f64,
 }
 
 impl BoundingBox {
@@ -43,8 +43,8 @@ pub struct Robot {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Object {
-    pose: Pose,
-    bounds: BoundingBox,
+    pub pose: Pose,
+    pub bounds: BoundingBox,
 }
 
 impl Object {
