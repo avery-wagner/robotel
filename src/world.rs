@@ -32,7 +32,7 @@ impl WorldConfig {
         Self {
             w,
             h,
-            timestep: Duration::from_secs_f64(0.01),
+            timestep: Duration::from_secs_f64(0.05),
         }
     }
 }
@@ -85,7 +85,7 @@ impl World {
         const TURN_SPEED: f64 = 1.0;
         const MOVE_SPEED: f64 = 1.0;
         let key_event = self.on_key_event(elapsed)?;
-        
+
         match (key_event.kind, key_event.code) {
             (_, KeyCode::Esc) => Some(Command::Quit), // always quit on 'Esc'
             (_, KeyCode::Char('c') | KeyCode::Char('C')) => {
@@ -106,20 +106,23 @@ impl World {
                 Some(Command::Move { v: -MOVE_SPEED })
             }
             (KeyEventKind::Press | KeyEventKind::Repeat, KeyCode::Right) => {
-                Some(Command::Turn { omega: TURN_SPEED })
+                Some(Command::Turn { omega: -TURN_SPEED }) // CW
             }
             (KeyEventKind::Press | KeyEventKind::Repeat, KeyCode::Left) => {
-                Some(Command::Turn { omega: -TURN_SPEED })
+                Some(Command::Turn { omega: TURN_SPEED }) // CCW
             }
-            _ => None,
+            _ => Some(Command::Stop),
+            // _ => None,
         }
     }
 
     pub fn setup_ui(&mut self) {
         enable_raw_mode().unwrap();
-        self.stdout.execute(
-            PushKeyboardEnhancementFlags(KeyboardEnhancementFlags::REPORT_EVENT_TYPES)
-        ).unwrap(); // execute!(...) -> write to terminal + immediately flush, need for immediate effect of keyboard enhancement flags
+        self.stdout
+            .execute(PushKeyboardEnhancementFlags(
+                KeyboardEnhancementFlags::REPORT_EVENT_TYPES,
+            ))
+            .unwrap(); // execute!(...) -> write to terminal + immediately flush, need for immediate effect of keyboard enhancement flags
 
         self.stdout
             .queue(SetSize(self.config.w, self.config.h))
@@ -128,8 +131,8 @@ impl World {
             .unwrap()
             .queue(Hide)
             .unwrap();
-    
-        self.stdout.flush().unwrap() 
+
+        self.stdout.flush().unwrap()
     }
 
     pub fn reset_ui(&mut self) {
@@ -142,7 +145,7 @@ impl World {
             .unwrap()
             .queue(ResetColor)
             .unwrap();
-        
+
         self.stdout.execute(PopKeyboardEnhancementFlags).unwrap();
         disable_raw_mode().unwrap();
     }
@@ -226,11 +229,14 @@ impl World {
 
         // 2. quantize for 8 directions:
         let i = (self.robot.pose.theta / (2.0 * pi / 8.0)).round() as usize % 8;
+        // let chars = ["<", "↙", "v", "↘", ">", "↗", "^", "↖"];
         let chars = [">", "↗", "^", "↖", "<", "↙", "v", "↘"];
+
         let c = chars[i];
 
         let x = self.robot.pose.x as u16 + 1;
-        let y = self.robot.pose.y as u16 + 1;
+        // let y = self.robot.pose.y as u16 + 1;
+        let y = (self.config.h as f64 - self.robot.pose.y) as u16 + 1;
 
         self.stdout
             .queue(MoveTo(x, y))

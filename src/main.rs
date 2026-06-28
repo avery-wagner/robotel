@@ -19,6 +19,7 @@ use std::f64::consts::PI as pi;
 
 mod robot;
 mod world;
+mod direction;
 
 use crate::robot::*;
 use crate::world::*;
@@ -51,8 +52,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         run = false;
                         break;
                     }
-                    Some(cmd) => curr_cmd = cmd,
-                    None => curr_cmd = Command::Stop,
+                    // Some(cmd) => curr_cmd = cmd,
+                    // None => curr_cmd = Command::Stop,
+                    _ => curr_cmd = cmd,
                 }
             }
         }
