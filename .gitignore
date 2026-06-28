@@ -1,1 +1,8 @@
 /target
+**/*.rs.bk
+*.pdb
+.DS_store
+.idea/
+.vscode/
+AGENTS.md
+tests/smoke_test.rs
