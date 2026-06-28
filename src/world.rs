@@ -4,21 +4,18 @@ use crossterm::{
         poll, read, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, KeyboardEnhancementFlags,
         PopKeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
     },
-    execute,
     style::{Color, Print, ResetColor, SetForegroundColor},
-    terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType, SetSize},
+    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType, SetSize},
     ExecutableCommand, QueueableCommand,
 };
 
 use std::{
     io::{stdout, Stdout, Write},
-    thread,
-    time::{Duration, Instant},
+    time::Duration,
 };
 
-use std::f64::consts::PI as pi;
-
 use crate::robot::*;
+use std::f64::consts::PI as pi;
 
 #[derive(Debug)]
 pub struct WorldConfig {
@@ -61,7 +58,7 @@ impl World {
         self.robot.cmd = Some(cmd);
         self.robot.exec_cmd(dt);
 
-        // check collisions
+        // TODO check collisions
         // todo!();
 
         self.clock += dt;
@@ -112,7 +109,6 @@ impl World {
                 Some(Command::Turn { omega: TURN_SPEED }) // CCW
             }
             _ => Some(Command::Stop),
-            // _ => None,
         }
     }
 
@@ -122,7 +118,8 @@ impl World {
             .execute(PushKeyboardEnhancementFlags(
                 KeyboardEnhancementFlags::REPORT_EVENT_TYPES,
             ))
-            .unwrap(); // execute!(...) -> write to terminal + immediately flush, need for immediate effect of keyboard enhancement flags
+            .unwrap();
+        // note: execute!(...) -> write to terminal + immediately flush, need for immediate effect of keyboard enhancement flags
 
         self.stdout
             .queue(SetSize(self.config.w, self.config.h))
@@ -229,13 +226,11 @@ impl World {
 
         // 2. quantize for 8 directions:
         let i = (self.robot.pose.theta / (2.0 * pi / 8.0)).round() as usize % 8;
-        // let chars = ["<", "↙", "v", "↘", ">", "↗", "^", "↖"];
         let chars = [">", "↗", "^", "↖", "<", "↙", "v", "↘"];
 
         let c = chars[i];
 
         let x = self.robot.pose.x as u16 + 1;
-        // let y = self.robot.pose.y as u16 + 1;
         let y = (self.config.h as f64 - self.robot.pose.y) as u16 + 1;
 
         self.stdout
@@ -255,11 +250,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_quantization() { 
-        let robot = Robot::new(Pose::new(5.0, 5.0, pi/2.0), BoundingBox::new(2.0, 2.0), Some(Command::Turn{omega: pi/2.0}));
+    fn test_quantization() {
+        let robot = Robot::new(
+            Pose::new(5.0, 5.0, pi / 2.0),
+            BoundingBox::new(2.0, 2.0),
+            Some(Command::Turn { omega: pi / 2.0 }),
+        );
         let obj1 = Object::new(Pose::new(10.0, 0.0, 0.0), BoundingBox::new(2.0, 2.0));
         let mut world = World::init(WorldConfig::new(20, 20), robot, vec![obj1], stdout());
-        
+
         // 1. normalize theta to fall within [0, 2pi]
         world.robot.pose.theta = world.robot.pose.theta.rem_euclid(2.0 * pi);
 
@@ -268,7 +267,6 @@ mod tests {
         let chars = [">", "↗", "^", "↖", "<", "↙", "v", "↘"];
         let c = chars[i];
 
-        assert!(c == "^"); 
+        assert!(c == "^");
     }
-
 }

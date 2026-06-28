@@ -1,6 +1,4 @@
-# robotel
-
-*WIP*
+# robotel (*WIP*)
 
 OpenTelemetry harness for a mini robotics sim, written in Rust.
 
@@ -10,4 +8,5 @@ OpenTelemetry harness for a mini robotics sim, written in Rust.
 ## WIP
 
 Currently in phase one of dev (basic 2D physics sim + UI)
+
 **Next**: sensor simulation, OTeL integration, OTLP visualizations
