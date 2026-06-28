@@ -1,4 +1,11 @@
-use std::time::Duration;
+//use std::f64::consts::PI as pi;
+use std::{
+    f64::{consts::{PI as pi}},
+    io::{stdout, Stdout, Write},
+    thread,
+    time::{Duration, Instant},
+};
+use approx::{assert_relative_eq};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Point {
@@ -80,3 +87,41 @@ impl Robot {
         }
     }
 }
+
+
+#[cfg(test)] // only run tests on `cargo test`
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_exec_cmd_move() { 
+        let mut robot = Robot::new(Pose::new(5.0, 5.0, pi/2.0), BoundingBox::new(2.0, 2.0), Some(Command::Move{v: 1.0}));
+        let expected_theta = robot.pose.theta;
+       
+        robot.exec_cmd(0.05);
+        println!("{:?}", robot.pose);
+
+        assert_relative_eq!(robot.pose.theta, expected_theta);
+        assert_relative_eq!(robot.pose.x, 5.0);
+        assert_relative_eq!(robot.pose.y, 5.05);
+    }
+
+    #[test]
+    fn test_exec_cmd_turn() { 
+        let dt = 0.05;
+        let omega = pi/2.0;
+        let diff = omega * dt; // == pi/40.0
+        let expected_theta =  omega + diff;
+        println!("{:?} expected", expected_theta);
+
+        let mut robot = Robot::new(Pose::new(5.0, 5.0, pi/2.0), BoundingBox::new(2.0, 2.0), Some(Command::Turn{ omega: omega }));
+        println!("{:?} before", robot.pose);
+        
+        robot.exec_cmd(dt);
+        println!("{:?} after", robot.pose);
+        
+        assert_relative_eq!(robot.pose.theta, expected_theta);
+        assert_relative_eq!(robot.pose.x, 5.0);
+        assert_relative_eq!(robot.pose.y, 5.0);
+    }
+  }

@@ -11,7 +11,7 @@ use crossterm::{
 };
 
 use std::{
-    io::{Stdout, Write},
+    io::{stdout, Stdout, Write},
     thread,
     time::{Duration, Instant},
 };
@@ -248,4 +248,27 @@ impl World {
     fn draw_objects(&mut self) {
         todo!()
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_quantization() { 
+        let robot = Robot::new(Pose::new(5.0, 5.0, pi/2.0), BoundingBox::new(2.0, 2.0), Some(Command::Turn{omega: pi/2.0}));
+        let obj1 = Object::new(Pose::new(10.0, 0.0, 0.0), BoundingBox::new(2.0, 2.0));
+        let mut world = World::init(WorldConfig::new(20, 20), robot, vec![obj1], stdout());
+        
+        // 1. normalize theta to fall within [0, 2pi]
+        world.robot.pose.theta = world.robot.pose.theta.rem_euclid(2.0 * pi);
+
+        // 2. quantize for 8 directions:
+        let i = (world.robot.pose.theta / (2.0 * pi / 8.0)).round() as usize % 8;
+        let chars = [">", "↗", "^", "↖", "<", "↙", "v", "↘"];
+        let c = chars[i];
+
+        assert!(c == "^"); 
+    }
+
 }

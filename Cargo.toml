@@ -24,6 +24,7 @@ tracing-opentelemetry = "0.28"
 
 # sim controls
 crossterm = { version = "0.28.1", features = ["event-stream"] }
+approx = "0.5"
 # not sure abt these; used in rs_snake:
 # futures = "0.3"
 # futures-timer = "3"
